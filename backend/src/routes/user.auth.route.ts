@@ -1,14 +1,17 @@
 import exp from 'constants'
-import { Express, Router } from 'express'
-import { signup } from '../controllers/user.auth.controller'
+import { Express, Router, Response, Request, NextFunction } from 'express'
+import {
+  checkAuth,
+  login,
+  logout,
+  signup,
+} from '../controllers/user.auth.controller'
+import { verifyToken } from '../middleware/verifyToken'
 const router: Router = Router()
 
 router.post('/signup', signup)
-router.post('/login', (req, res) => {
-  res.send('login')
-})
-router.get('/logout', (req, res) => {
-  res.send('logout')
-})
+router.post('/login', login)
+router.get('/logout', logout)
+router.get('/check-auth', verifyToken, checkAuth)
 
 export default router
