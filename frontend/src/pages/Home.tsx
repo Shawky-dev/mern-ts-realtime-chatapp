@@ -32,8 +32,10 @@ const groups = [
     image: 'https://via.placeholder.com/150?text=BC',
   },
 ]
+import { useNavigate } from 'react-router-dom'
 
 export default function Home({}: Props) {
+  const navigate = useNavigate()
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const nextGroup = () => {
@@ -57,10 +59,16 @@ export default function Home({}: Props) {
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">Web Chatroom</h1>
           <div>
-            <button className="mr-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+            <button
+              onClick={() => navigate('/login')}
+              className="mr-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
               Login
             </button>
-            <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+            <button
+              onClick={() => navigate('/signup')}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
               Sign Up
             </button>
           </div>

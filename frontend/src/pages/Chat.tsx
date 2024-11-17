@@ -1,4 +1,5 @@
 import React from 'react'
+import { FaCog, FaSearch } from 'react-icons/fa'
 
 type Props = {}
 
@@ -6,10 +7,33 @@ export default function Chat({}: Props) {
   return (
     <div>
       <div className="h-screen flex bg-gray-100">
+        {/* <!-- Settings Sidebar --> */}
+        <div className="w-16 bg-gray-50 border-r border-gray-200 flex flex-col items-center justify-between pt-6 pb-3  space-y-4">
+          <div className="flex flex-col gap-4">
+            <FaSearch
+              className="text-gray-600 cursor-pointer"
+              size={24}
+              color="black"
+            />
+          </div>
+          <div className="flex flex-col gap-4 items-center">
+            <FaCog
+              className="text-gray-600 cursor-pointer "
+              color="black"
+              size={24}
+            />
+            <img
+              src="https://picsum.photos/id/237/200/300"
+              alt="Profile"
+              className="w-12 h-12 rounded-full overflow-visible"
+            />
+          </div>
+        </div>
+
         {/* <!-- Sidebar --> */}
         <div className="w-1/4 bg-gray-50 border-r border-gray-200">
           {/* <!-- Header --> */}
-          <div className="p-4 border-b border-gray-300 bg-gray-200">
+          <div className="p-4 border-b border-gray-300 bg-gray-200 flex justify-between items-center">
             <h1 className="text-lg font-bold">Chats</h1>
           </div>
           {/* <!-- Contact List --> */}
