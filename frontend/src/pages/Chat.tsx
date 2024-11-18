@@ -1,9 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FaCog, FaSearch } from 'react-icons/fa'
+import axios from '../axiosConfig' // Import axios instance
 
 type Props = {}
 
 export default function Chat({}: Props) {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const toggleMenu = () => setMenuOpen(!menuOpen)
+
+  const handleLogout = async () => {
+    try {
+      await axios.get('/auth/logout')
+      alert('Logged out successfully')
+    } catch (error) {
+      console.error('Error logging out:', error)
+      alert('Failed to log out')
+    }
+  }
+
   return (
     <div>
       <div className="h-screen flex bg-gray-100">
@@ -21,7 +35,20 @@ export default function Chat({}: Props) {
               className="text-gray-600 cursor-pointer "
               color="black"
               size={24}
+              onClick={toggleMenu}
             />
+            {menuOpen && (
+              <div className="absolute bottom-12 left-0 w-32 bg-white shadow-md border rounded-lg">
+                <ul className="text-sm text-gray-700">
+                  <li
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={handleLogout} // Use handleLogout function
+                  >
+                    Logout
+                  </li>
+                </ul>
+              </div>
+            )}
             <img
               src="https://picsum.photos/id/237/200/300"
               alt="Profile"
