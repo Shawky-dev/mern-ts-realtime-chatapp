@@ -87,7 +87,7 @@ export const login = asyncHandler(
 )
 
 //@desc     Logout a user
-//@route    GET /api/auth/logout
+//@route    GET /auth/logout
 //@access   Public
 export const logout = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {

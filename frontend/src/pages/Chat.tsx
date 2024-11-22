@@ -1,130 +1,117 @@
-import React, { useState } from 'react'
-import { FaCog, FaSearch } from 'react-icons/fa'
-import axios from '../axiosConfig' // Import axios instance
+'use client'
 
-type Props = {}
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import axiosInstance from '@/api/axiosConfig'
+import { Input } from '@/components/ui/input'
+import { Mic, Paperclip, SendHorizontal, Smile } from 'lucide-react'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Textarea } from '@/components/ui/textarea'
+import ChatArea from '@/components/ChatArea'
+import { message } from '@/components/ChatArea'
+export default function Chat() {
+  const [messages, setMessages] = useState<message[]>([])
 
-export default function Chat({}: Props) {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const toggleMenu = () => setMenuOpen(!menuOpen)
-
-  const handleLogout = async () => {
-    try {
-      await axios.get('/auth/logout')
-      alert('Logged out successfully')
-    } catch (error) {
-      console.error('Error logging out:', error)
-      alert('Failed to log out')
-    }
+  const navigate = useNavigate()
+  const [isTyping, SetIsTyping] = useState<boolean>(false)
+  const [message, SetMessage] = useState<string>('')
+  const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    SetMessage(e.target.value)
+    SetIsTyping(e.target.value.length > 0)
   }
 
+  const handleSubmit = () => {
+    if (message === '') {
+      return
+    }
+    setMessages([
+      ...messages,
+      {
+        text: message,
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+        }),
+        userID: '1',
+        isSent: true,
+      },
+    ])
+    SetMessage('')
+  }
+
+  // Check if the user is authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await axiosInstance.get(
+          'http://localhost:3000/auth/check-auth'
+        )
+        if (response.data.success) {
+          //get user data
+        }
+      } catch (error) {
+        console.error('User is not authenticated:', error)
+        navigate('/login')
+
+        // If there's an error (e.g., token invalid), the user stays on the home page
+      }
+    }
+
+    checkAuth()
+  }, [navigate])
   return (
-    <div>
-      <div className="h-screen flex bg-gray-100">
-        {/* <!-- Settings Sidebar --> */}
-        <div className="w-16 bg-gray-50 border-r border-gray-200 flex flex-col items-center justify-between pt-6 pb-3  space-y-4">
-          <div className="flex flex-col gap-4">
-            <FaSearch
-              className="text-gray-600 cursor-pointer"
-              size={24}
-              color="black"
-            />
+    <div className="bg-[#ECE3D4] h-screen text-[#755132] font-[Cairo]">
+      <div className="flex flex-row p-10 h-full">
+        {/* SideBar */}
+        <div className="flex flex-row w-3/5">
+          {/* settingsSidebar */}
+          <div className="bg-[#755132] text-[#ECE3D4] w-1/12 flex flex-col">
+            settings
           </div>
-          <div className="flex flex-col gap-4 items-center">
-            <FaCog
-              className="text-gray-600 cursor-pointer "
-              color="black"
-              size={24}
-              onClick={toggleMenu}
+          {/* contactList */}
+          <div className="flex flex-col bg-[#ECE3D4] border-t-2 border-b-[2px]  border-[#8F633D] w-full">
+            <div className="bg-[#D5B990] h-16 w-full pt-3 pl-3">contact</div>
+            <div className="">contact list</div>
+          </div>
+        </div>
+        {/* Chat */}
+        <div className="flex flex-col bg-[#ECE3D4] border-2 border-[#8F633D] grow w-full">
+          <div className="bg-[#D5B990] h-16 pt-3 pl-3 pb-2 w-full p-1 flex flex-row">
+            <Avatar>
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+            <div className="ml-2">
+              <h1>[roomName]</h1>
+              <p>[member1,member2]</p>
+            </div>
+          </div>
+          <div className="grow overflow-scroll">
+            <ChatArea messages={messages} />
+          </div>
+          <div className="h-14 bg-[#D5B990] p-2 flex flex-row items-center gap-2">
+            <Smile color="#8F633D" />
+            <Paperclip color="#8F633D" />
+            <Input
+              className="bg-[#ECE3D4]"
+              value={message}
+              onChange={handleInputChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSubmit()
+                }
+              }}
             />
-            {menuOpen && (
-              <div className="absolute bottom-12 left-0 w-32 bg-white shadow-md border rounded-lg">
-                <ul className="text-sm text-gray-700">
-                  <li
-                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={handleLogout} // Use handleLogout function
-                  >
-                    Logout
-                  </li>
-                </ul>
-              </div>
+            {isTyping ? (
+              <SendHorizontal
+                color="#8F633D"
+                onClick={handleSubmit}
+                className=" cursor-pointer"
+              />
+            ) : (
+              <Mic color="#8F633D" />
             )}
-            <img
-              src="https://picsum.photos/id/237/200/300"
-              alt="Profile"
-              className="w-12 h-12 rounded-full overflow-visible"
-            />
-          </div>
-        </div>
-
-        {/* <!-- Sidebar --> */}
-        <div className="w-1/4 bg-gray-50 border-r border-gray-200">
-          {/* <!-- Header --> */}
-          <div className="p-4 border-b border-gray-300 bg-gray-200 flex justify-between items-center">
-            <h1 className="text-lg font-bold">Chats</h1>
-          </div>
-          {/* <!-- Contact List --> */}
-          <ul className="overflow-y-auto h-[calc(100%-64px)]">
-            <li className="p-4 hover:bg-gray-100 cursor-pointer border-b border-gray-200 flex items-center">
-              <img
-                src="https://picsum.photos/id/237/200/300"
-                alt="Profile"
-                className="w-12 h-12 rounded-full mr-4"
-              />
-              <div>
-                <h2 className="font-semibold">John Doe</h2>
-                <p className="text-sm text-gray-600 truncate">
-                  Hey, are you free now?
-                </p>
-              </div>
-            </li>
-            {/* <!-- Repeat for other contacts --> */}
-          </ul>
-        </div>
-
-        {/* <!-- Chat Window --> */}
-        <div className="w-3/4 flex flex-col">
-          {/* <!-- Chat Header --> */}
-          <div className="p-4 border-b border-gray-300 bg-gray-200 flex justify-between items-center">
-            <div className="flex items-center">
-              <img
-                src="https://picsum.photos/id/237/200/300"
-                alt="Profile"
-                className="w-12 h-12 rounded-full mr-4"
-              />
-              <h2 className="text-lg font-bold">John Doe</h2>
-            </div>
-            <div className="text-sm text-gray-600">Online</div>
-          </div>
-
-          {/* <!-- Chat Messages --> */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100">
-            {/* <!-- Incoming Message --> */}
-            <div className="flex items-start">
-              <div className="bg-gray-200 p-2 rounded-lg max-w-xs">
-                <p className="text-sm">Hey! How are you?</p>
-              </div>
-            </div>
-            {/* <!-- Outgoing Message --> */}
-            <div className="flex items-end justify-end">
-              <div className="bg-green-200 p-2 rounded-lg max-w-xs">
-                <p className="text-sm">I'm good! How about you?</p>
-              </div>
-            </div>
-          </div>
-
-          {/* <!-- Input Box --> */}
-          <div className="p-4 bg-gray-200 border-t border-gray-300">
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
-                placeholder="Type a message"
-              />
-              <button className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
-                Send
-              </button>
-            </div>
           </div>
         </div>
       </div>

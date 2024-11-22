@@ -1,11 +1,15 @@
+//library-imports
 import express, { Express, Request, Response } from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
-
-import { connectDB } from './config/dbConfig'
+//route-imports
+import userRoute from './routes/user.route'
 import userAuthRoute from './routes/user.auth.route'
+//db-imports
+import { connectDB } from './config/dbConfig'
+//middleware-imports
 import { logger } from './middleware/logEvents'
 import corsOptions from './config/corsOptions'
 import errorHandler from './middleware/errorHandler'
@@ -33,9 +37,8 @@ app.use(express.json())
 app.use(cookieParser())
 
 //Routes
-
+app.use('/user', userRoute)
 app.use('/auth', userAuthRoute)
-
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server')
 })
@@ -43,10 +46,9 @@ app.get('/', (req: Request, res: Response) => {
 app.use(errorHandler)
 
 io.on('connection', (socket) => {
-  console.log('a user connected')
-  console.log(socket.id)
+  console.log(`${socket.id} just connected`)
   socket.on('disconnect', () => {
-    console.log('user disconnected')
+    console.log(`${socket.id} just disconnected`)
   })
 })
 

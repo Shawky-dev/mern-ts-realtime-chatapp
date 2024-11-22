@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 
-//TODO⭕:add phone number
 const userSchema = new mongoose.Schema(
   {
     email: {
@@ -15,6 +14,9 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+    },
+    about: {
+      type: String,
     },
     lastlogin: {
       type: Date,
