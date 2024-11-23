@@ -1,44 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axiosInstance from '@/api/axiosConfig'
-import { Input } from '@/components/ui/input'
-import { Mic, Paperclip, SendHorizontal, Smile } from 'lucide-react'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { Textarea } from '@/components/ui/textarea'
 import ChatArea from '@/components/ChatArea'
-import { message } from '@/components/ChatArea'
+import { io } from 'socket.io-client' // Add this line
+
 export default function Chat() {
-  const [messages, setMessages] = useState<message[]>([])
-
   const navigate = useNavigate()
-  const [isTyping, SetIsTyping] = useState<boolean>(false)
-  const [message, SetMessage] = useState<string>('')
-  const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    SetMessage(e.target.value)
-    SetIsTyping(e.target.value.length > 0)
-  }
-
-  const handleSubmit = () => {
-    if (message === '') {
-      return
-    }
-    setMessages([
-      ...messages,
-      {
-        text: message,
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-        }),
-        userID: '1',
-        isSent: true,
-      },
-    ])
-    SetMessage('')
-  }
+  const socket = io('http://localhost:3000') // Add this line
 
   // Check if the user is authenticated
   useEffect(() => {
@@ -87,32 +58,7 @@ export default function Chat() {
               <p>[member1,member2]</p>
             </div>
           </div>
-          <div className="grow overflow-scroll">
-            <ChatArea messages={messages} />
-          </div>
-          <div className="h-14 bg-[#D5B990] p-2 flex flex-row items-center gap-2">
-            <Smile color="#8F633D" />
-            <Paperclip color="#8F633D" />
-            <Input
-              className="bg-[#ECE3D4]"
-              value={message}
-              onChange={handleInputChange}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleSubmit()
-                }
-              }}
-            />
-            {isTyping ? (
-              <SendHorizontal
-                color="#8F633D"
-                onClick={handleSubmit}
-                className=" cursor-pointer"
-              />
-            ) : (
-              <Mic color="#8F633D" />
-            )}
-          </div>
+          <ChatArea socket={socket} /> {/* Pass socket as a prop */}
         </div>
       </div>
     </div>

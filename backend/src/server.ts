@@ -30,7 +30,6 @@ const io = new Server(server, {
 const port = process.env.PORT || 3000
 //Middleware
 app.use(logger)
-
 app.use(cors(corsOptions))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
@@ -47,6 +46,10 @@ app.use(errorHandler)
 
 io.on('connection', (socket) => {
   console.log(`${socket.id} just connected`)
+  socket.on('sendMessage', (message: string) => {
+    console.log(message)
+    socket.broadcast.emit('receiveMessage', message)
+  })
   socket.on('disconnect', () => {
     console.log(`${socket.id} just disconnected`)
   })
